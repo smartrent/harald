@@ -35,7 +35,7 @@ defmodule Harald.MixProject do
 
   defp deps do
     [
-      {:circuits_uart, "~> 1.4"},
+      {:circuits_uart, "~> 1.4", optional: true},
       {:credo, "~> 1.4", runtime: false, only: [:test]},
       {:dialyxir, "~> 1.0", runtime: false, only: [:test]},
       {:ex_doc, "~> 0.22", only: [:dev], runtime: false},
