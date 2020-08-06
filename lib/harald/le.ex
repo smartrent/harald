@@ -57,14 +57,14 @@ defmodule Harald.LE do
   end
 
   def handle_info({:stop_scan, ns, from}, %State{devices: devices}) do
-    :ok = Transport.send_command(ns, LEController.set_enable_scan(false))
+    {:ok, _} = Transport.send_command(ns, LEController.set_enable_scan(false))
     GenServer.reply(from, devices)
     {:noreply, %State{}}
   end
 
   @impl GenServer
   def handle_call({:scan, ns, timeout}, from, state) do
-    :ok = Transport.send_command(ns, LEController.set_enable_scan(true, true))
+    {:ok, _} = Transport.send_command(ns, LEController.set_enable_scan(true, true))
     Process.send_after(self(), {:stop_scan, ns, from}, timeout)
     {:noreply, state}
   end
