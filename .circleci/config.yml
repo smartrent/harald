@@ -1,57 +1,44 @@
-version: 2.1
+version: 2
+
+install_elixir: &install_elixir
+  run:
+    name: Install Elixir
+    command: |
+      wget https://repo.hex.pm/builds/elixir/v$ELIXIR_VERSION.zip
+      unzip -d /usr/local/elixir v$ELIXIR_VERSION.zip
+      echo 'export PATH=/usr/local/elixir/bin:$PATH' >> $BASH_ENV
+install_hex_rebar: &install_hex_rebar
+  run:
+    name: Install hex and rebar
+    command: |
+      mix local.hex --force
+      mix local.rebar --force
+defaults: &defaults
+  working_directory: ~/repo
+
 jobs:
-  test:
+  build:
     docker:
-      - image: circleci/elixir:1.8.1
+      - image: erlang:23.0.1
         environment:
-          MIX_ENV: prod
+          ELIXIR_VERSION: 1.10.3-otp-23
+          LC_ALL: C.UTF-8
+          SUDO: true
+    <<: *defaults
     steps:
       - checkout
+      - <<: *install_elixir
+      - <<: *install_hex_rebar
       - restore_cache:
           keys:
-            - v1-{{ .Branch }}
-            - v1
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix clean --deps # dialyzer plts survive this
+            - v1-mix-cache-{{ checksum "mix.lock" }}
       - run: mix deps.get
-      - run: mix compile --warnings-as-errors
-      - run: MIX_ENV=test mix test
-      - run: mix credo
       - run: mix format --check-formatted
-      - run: mix dialyzer --plt
+      - run: mix test
+      - run: mix docs
+      - run: mix hex.build
       - save_cache:
-          key: v1-{{ .Branch }}-{{ epoch }}
+          key: v1-mix-cache-{{ checksum "mix.lock" }}
           paths:
             - _build
-      - save_cache:
-          key: v1-{{ epoch }}
-          paths:
-            - _build
-      - run: MIX_ENV=prod mix dialyzer --halt-exit-status
-  coveralls_report:
-    docker:
-      - image: circleci/elixir:1.8.1
-        environment:
-          MIX_ENV: test
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-{{ .Branch }}
-            - v1
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix clean --deps # dialyzer plts survive this
-      - run: mix deps.get
-      - run: mix compile --warnings-as-errors
-      - run: MIX_ENV=test mix coveralls.circle
-workflows:
-  version: 2
-  test_and_deploy:
-    jobs:
-      - test
-      - coveralls_report:
-          filters:
-            branches:
-              only: master
+            - deps
