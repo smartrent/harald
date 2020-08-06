@@ -7,12 +7,12 @@ defmodule Harald.HCI.Event do
   Reference: Version 5.0, Vol 2, Part E, 5.4.4
   """
 
-  alias Harald.HCI.Event.{InquiryComplete, LEMeta}
+  alias Harald.HCI.Event.{InquiryComplete, LEMeta, CommandComplete}
   alias Harald.Serializable
 
   @behaviour Serializable
 
-  @event_modules [InquiryComplete, LEMeta]
+  @event_modules [InquiryComplete, LEMeta, CommandComplete]
 
   @typedoc """
   > Each event is assigned a 1-Octet event code used to uniquely identify different types of
@@ -56,12 +56,14 @@ defmodule Harald.HCI.Event do
   def deserialize(binary)
 
   Enum.each(@event_modules, fn module ->
-    def deserialize(<<unquote(module.event_code()), length, event_parameters::binary>> = bin) do
-      if length == byte_size(event_parameters) do
-        unquote(module).deserialize(event_parameters)
-      else
-        {:error, bin}
-      end
+    def deserialize(
+          <<unquote(module.event_code()), length, event_parameters::binary-size(length)>>
+        ) do
+      unquote(module).deserialize(event_parameters)
+    end
+
+    def deserialize(<<unquote(module.event_code()), _::binary>> = bin) do
+      {:error, bin}
     end
   end)
 
