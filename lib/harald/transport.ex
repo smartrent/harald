@@ -12,7 +12,7 @@ defmodule Harald.Transport do
 
   defmodule State do
     @moduledoc false
-    @enforce_keys [:adapter, :adapter_state, :handlers]
+    @enforce_keys [:adapter, :adapter_state, :handlers, :caller, :opcode]
     defstruct @enforce_keys
   end
 
@@ -44,7 +44,14 @@ defmodule Harald.Transport do
         pid
       end
 
-    {:ok, %State{adapter: adapter, adapter_state: adapter_state, handlers: handler_pids}}
+    {:ok,
+     %State{
+       adapter: adapter,
+       adapter_state: adapter_state,
+       handlers: handler_pids,
+       caller: nil,
+       opcode: nil
+     }}
   end
 
   @doc """
@@ -58,13 +65,29 @@ defmodule Harald.Transport do
   end
 
   @impl GenServer
-  def handle_info({:transport_adapter, msg}, %{handlers: handlers} = state) do
-    {_, data} = HCI.deserialize(msg)
-    send_to_handlers(data, handlers)
-    {:noreply, state}
+  def handle_info({:transport_adapter, msg}, %{handlers: handlers, opcode: opcode} = state) do
+    case HCI.deserialize(msg) do
+      # check if the message is a reply to the command in progress
+      {:ok, %Harald.HCI.Event.CommandComplete{opcode: ^opcode}} = reply ->
+        GenServer.reply(state.caller, reply)
+        {:noreply, %{state | opcode: nil, caller: nil}}
+
+      {_, data} ->
+        send_to_handlers(data, handlers)
+        {:noreply, state}
+    end
   end
 
   @impl GenServer
+  def handle_call(
+        {:send_command, <<opcode::little-size(16), _::binary>> = command},
+        from,
+        %State{adapter: adapter, adapter_state: adapter_state} = state
+      ) do
+    {:ok, adapter_state} = adapter.send_command(command, adapter_state)
+    {:noreply, %State{state | adapter_state: adapter_state, opcode: opcode, caller: from}}
+  end
+
   def handle_call(
         {:send_command, command},
         _from,
