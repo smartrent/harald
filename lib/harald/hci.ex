@@ -57,7 +57,7 @@ defmodule Harald.HCI do
     command(opcode, opts_bin)
   end
 
-  def command(opcode, opts) do
+  def command(opcode, opts) when is_binary(opts) do
     s = byte_size(opts)
     opcode <> <<s::size(8)>> <> opts
   end
