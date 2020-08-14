@@ -9,6 +9,9 @@ defmodule Harald.HCI.Event.CommandComplete do
 
   alias Harald.Serializable
 
+  require HCI.CommandComplete.ReturnParameters
+  require Logger
+
   @behaviour Serializable
 
   @type t :: %__MODULE__{}
@@ -37,14 +40,29 @@ defmodule Harald.HCI.Event.CommandComplete do
   end
 
   @impl Serializable
-  def deserialize(<<num_hci_command_packets::8, opcode::little-16, return_parameters::binary>>) do
-    {:ok,
-     %__MODULE__{
-       num_hci_command_packets: num_hci_command_packets,
-       opcode: opcode,
-       return_parameters: return_parameters
-     }}
+  def deserialize(<<num_hci_command_packets::8, opcode::binary-2, rp_bin::binary>>) do
+    command_complete = %__MODULE__{
+      num_hci_command_packets: num_hci_command_packets,
+      opcode: opcode,
+      return_parameters: rp_bin
+    }
+
+    {:ok, maybe_parse_return_parameters(command_complete)}
   end
 
   def deserialize(bin), do: {:error, bin}
+
+  def maybe_parse_return_parameters(cc) do
+    HCI.CommandComplete.ReturnParameters.parse(cc)
+  catch
+    kind, value ->
+      Logger.warn("""
+      (#{inspect(kind)}, #{inspect(value)}) Unable to parse return_parameters for opcode #{
+        inspect(cc.opcode)
+      }
+        return_parameters: #{inspect(cc.return_parameters)}
+      """)
+
+      cc
+  end
 end
