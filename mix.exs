@@ -38,6 +38,7 @@ defmodule Harald.MixProject do
       {:circuits_uart, "~> 1.4", optional: true},
       {:credo, "~> 1.4", runtime: false, only: [:test]},
       {:dialyxir, "~> 1.0", runtime: false, only: [:test]},
+      {:ex_bin, "~> 0.4"},
       {:ex_doc, "~> 0.22", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.13", only: [:test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: [:test], runtime: false},

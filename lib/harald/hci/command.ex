@@ -2,21 +2,29 @@ defmodule Harald.HCI.Command do
   @callback return_parameters(binary()) :: map() | binary()
   @callback deserialize(binary()) :: {:ok, term()} | {:error, term()}
 
+  alias __MODULE__.{ControllerAndBaseband}
+
   @modules [
-    Harald.HCI.Command.ControllerAndBaseband.ReadLocalName
+    ControllerAndBaseband.ReadLocalName,
+    ControllerAndBaseband.Reset,
+    ControllerAndBaseband.SetEventMask,
+    ControllerAndBaseband.WriteClassOfDevice,
+    ControllerAndBaseband.WriteLocalName,
+    ControllerAndBaseband.WritePageTimeout,
+    ControllerAndBaseband.WriteSimplePairingMode
   ]
 
   def __modules__(), do: @modules
 
-  defmacro defparameters(fields) when is_list(fields) do
-    fields =
-      if Keyword.keyword?(fields) do
-        fields
-      else
-        for key <- fields, do: {key, nil}
-      end
-
+  defmacro defparameters(fields) do
     quote location: :keep, bind_quoted: [fields: fields] do
+      fields =
+        if Keyword.keyword?(fields) do
+          fields
+        else
+          for key <- fields, do: {key, nil}
+        end
+
       # This is odd, but defparameters/1 is only intended to be used
       # in modules with Harald.HCI.Command.__using__/1 macro which will
       # have these attributes defined. If not, let it fail
