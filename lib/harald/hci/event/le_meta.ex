@@ -5,7 +5,11 @@ defmodule Harald.HCI.Event.LEMeta do
   Reference: Version 5.0, Vol 2, Part E, 7.7.65
   """
 
-  alias Harald.{HCI.Event.LEMeta.AdvertisingReport, Serializable}
+  alias Harald.{
+    HCI.Event.LEMeta.AdvertisingReport,
+    HCI.Event.LEMeta.ConnectionComplete,
+    Serializable
+  }
 
   @behaviour Serializable
 
@@ -26,7 +30,8 @@ defmodule Harald.HCI.Event.LEMeta do
   @event_code 0x3E
 
   @subevent_modules [
-    AdvertisingReport
+    AdvertisingReport,
+    ConnectionComplete
   ]
 
   @doc """
