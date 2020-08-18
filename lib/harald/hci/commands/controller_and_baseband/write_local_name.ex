@@ -17,7 +17,7 @@ defmodule Harald.HCI.Command.ControllerAndBaseband.WriteLocalName do
   * `:status` - see `Harald.ErrorCode`
   """
 
-  defparameters(name: "Harald")
+  defparameters name: "Harald"
 
   defimpl HCI.Serializable do
     def serialize(%{opcode: opcode, name: name}) do

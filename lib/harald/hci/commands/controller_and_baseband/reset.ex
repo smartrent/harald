@@ -25,7 +25,7 @@ defmodule Harald.HCI.Command.ControllerAndBaseband.Reset do
   * `:status` - see `Harald.ErrorCode`
   """
 
-  defparameters([])
+  defparameters []
 
   defimpl HCI.Serializable do
     def serialize(%{opcode: opcode}) do

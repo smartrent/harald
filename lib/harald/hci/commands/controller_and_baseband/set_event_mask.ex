@@ -78,7 +78,7 @@ defmodule Harald.HCI.Command.ControllerAndBaseband.SetEventMask do
     61 => :le_meta
   }
 
-  defparameters(Map.values(@events_map))
+  defparameters Map.values(@events_map)
 
   defimpl HCI.Serializable do
     def serialize(%{opcode: opcode} = sem) do
