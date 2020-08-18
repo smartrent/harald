@@ -7,12 +7,12 @@ defmodule Harald.HCI.Event do
   Reference: Version 5.0, Vol 2, Part E, 5.4.4
   """
 
-  alias Harald.HCI.Event.{InquiryComplete, LEMeta, CommandComplete}
+  alias Harald.HCI.Event.{InquiryComplete, LEMeta, CommandComplete, CommandStatus}
   alias Harald.Serializable
 
   @behaviour Serializable
 
-  @event_modules [InquiryComplete, LEMeta, CommandComplete]
+  @event_modules [InquiryComplete, LEMeta, CommandComplete, CommandStatus]
 
   @typedoc """
   > Each event is assigned a 1-Octet event code used to uniquely identify different types of
