@@ -2,7 +2,7 @@ defmodule Harald.HCI.Command do
   @callback return_parameters(binary()) :: map() | binary()
   @callback deserialize(binary()) :: {:ok, term()} | {:error, term()}
 
-  alias __MODULE__.{ControllerAndBaseband}
+  alias __MODULE__.{ControllerAndBaseband, LEController}
 
   @modules [
     ControllerAndBaseband.ReadLocalName,
@@ -11,7 +11,8 @@ defmodule Harald.HCI.Command do
     ControllerAndBaseband.WriteClassOfDevice,
     ControllerAndBaseband.WriteLocalName,
     ControllerAndBaseband.WritePageTimeout,
-    ControllerAndBaseband.WriteSimplePairingMode
+    ControllerAndBaseband.WriteSimplePairingMode,
+    LEController.CreateConnection
   ]
 
   def __modules__(), do: @modules
