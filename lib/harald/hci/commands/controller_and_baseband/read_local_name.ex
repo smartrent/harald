@@ -17,7 +17,7 @@ defmodule Harald.HCI.Command.ControllerAndBaseband.ReadLocalName do
   * `:local_name` - A UTF-8 encoded User Friendly Descriptive Name for the device
   """
 
-  defparameters([])
+  defparameters []
 
   defimpl HCI.Serializable do
     def serialize(%{opcode: opcode}) do

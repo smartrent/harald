@@ -23,7 +23,7 @@ defmodule Harald.HCI.Command.ControllerAndBaseband.WritePageTimeout do
   * `:status` - see `Harald.ErrorCode`
   """
 
-  defparameters(timeout: 0x20)
+  defparameters timeout: 0x20
 
   defimpl HCI.Serializable do
     def serialize(%{opcode: opcode, timeout: timeout}) do

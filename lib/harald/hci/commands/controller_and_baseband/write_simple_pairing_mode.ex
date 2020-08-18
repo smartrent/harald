@@ -35,7 +35,7 @@ defmodule Harald.HCI.Command.ControllerAndBaseband.WriteSimplePairingMode do
   * `:status` - see `Harald.ErrorCode`
   """
 
-  defparameters(enabled: false)
+  defparameters enabled: false
 
   defimpl HCI.Serializable do
     def serialize(%{opcode: opcode, enabled: enabled?}) do

@@ -17,7 +17,7 @@ defmodule Harald.HCI.Command.ControllerAndBaseband.WriteClassOfDevice do
   * `:status` - see `Harald.ErrorCode`
   """
 
-  defparameters(class: 0x00)
+  defparameters class: 0x00
 
   defimpl HCI.Serializable do
     def serialize(%{opcode: opcode, class: class}) do
